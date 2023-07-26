@@ -1,16 +1,17 @@
+import CustomerFactory from "../../../domain/customer/factory/customer.factory";
 import CustomerRepositoryInterface from "../../../domain/customer/repository/customer-repository.interface";
-import { InputFindCustomerDto, OutputFindCustomerDto } from "./find.customer.dto";
+import Address from "../../../domain/customer/value-object/address";
+import { InputCreateCustomerDto, OutputCreateCustomerDto } from "./create.customer.dto";
 
-export default class FindCustomerUseCase {
+export default class CreateCustomerUseCase {
     private customerRepository: CustomerRepositoryInterface;
-
     constructor(customerRepository: CustomerRepositoryInterface) {
         this.customerRepository = customerRepository;
     }
 
-    async execute(input: InputFindCustomerDto): Promise<OutputFindCustomerDto> {
-        const customer = await this.customerRepository.find(input.id);
-
+    async execute(input: InputCreateCustomerDto): Promise<OutputCreateCustomerDto> {
+        const customer = CustomerFactory.createWithAddress(input.name, new Address(input.address.street, input.address.number, input.address.zip, input.address.city));
+        await this.customerRepository.create(customer);
         return {
             id: customer.id,
             name: customer.name,
@@ -22,4 +23,5 @@ export default class FindCustomerUseCase {
             }
         }
     }
-};
+    
+}
